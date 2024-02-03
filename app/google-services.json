@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "11854638399",
+    "firebase_url": "https://dailycatholicquotes-2ef12-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "dailycatholicquotes-2ef12",
+    "storage_bucket": "dailycatholicquotes-2ef12.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:11854638399:android:c4563affe6f904f503f78a",
+        "android_client_info": {
+          "package_name": "com.dcq.quotesapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "11854638399-u3t34pl46qqgs7t542vg2f09gngd653m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBAoZ1xKF59O3w9JVX0My6oLg-FV1eWq48"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "11854638399-u3t34pl46qqgs7t542vg2f09gngd653m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

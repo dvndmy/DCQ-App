@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context=".Registration">
+
+        <Button
+            android:id="@+id/btn_save"
+            android:layout_width="148dp"
+            android:layout_height="80dp"
+            android:onClick="OnReg"
+            android:text="@string/submit"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/et_search" />
+
+        <EditText
+            android:id="@+id/et_quote"
+            android:layout_width="308dp"
+            android:layout_height="43dp"
+            android:layout_marginTop="24dp"
+            android:autofillHints="Enter the Quote:"
+            android:ems="10"
+            android:hint="@string/enter_the_quote"
+            android:inputType="textShortMessage|textAutoCorrect|textMultiLine"
+            android:singleLine="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+        <CheckBox
+            android:id="@+id/cb_verse"
+            android:layout_width="wrap_content"
+            android:layout_height="43dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:onClick="onVerseClick"
+            android:text="@string/bible_verse"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/cb_person"
+            app:layout_constraintTop_toBottomOf="@+id/et_person" />
+
+        <CheckBox
+            android:id="@+id/cb_other"
+            android:layout_width="wrap_content"
+            android:layout_height="43dp"
+            android:layout_marginTop="8dp"
+            android:onClick="onOtherClick"
+            android:text="@string/other"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cb_verse" />
+
+        <CheckBox
+            android:id="@+id/cb_person"
+            android:layout_width="wrap_content"
+            android:layout_height="43dp"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="8dp"
+            android:onClick="onPersonClick"
+            android:text="@string/catholic_person"
+            app:layout_constraintEnd_toStartOf="@+id/cb_verse"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/et_person" />
+
+        <EditText
+            android:id="@+id/et_person"
+            android:layout_width="308dp"
+            android:layout_height="43dp"
+            android:layout_marginTop="8dp"
+            android:autofillHints="Enter person/verse:"
+            android:ems="10"
+            android:hint="@string/enter_person_verse"
+            android:inputType="textPersonName|text|textAutoComplete"
+            app:layout_constraintBottom_toTopOf="@+id/cb_verse"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/et_quote" />
+
+        <EditText
+            android:id="@+id/et_search"
+            android:layout_width="308dp"
+            android:layout_height="43dp"
+            android:layout_marginTop="24dp"
+            android:autofillHints="Enter person/verse:"
+            android:ems="10"
+            android:hint="@string/search_term_for_photos_optional"
+            android:inputType="text|textAutoComplete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.504"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cb_other" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="@string/add_quote"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
