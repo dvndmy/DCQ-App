@@ -70,9 +70,9 @@ import java.util.Objects;
 public class WallpapersAdapter extends RecyclerView.Adapter<WallpapersAdapter.WallpaperViewHolder> implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     ArrayList<String> urlList;
-    private Context mCtx;
-    private List<Quote> wallpaperList;
-    private int STORAGE_PERMISSION_CODE = 1;
+    private final Context mCtx;
+    private final List<Quote> wallpaperList;
+    private final int STORAGE_PERMISSION_CODE = 1;
     private String[] images;
     private int imagesIndex = 0;
 
@@ -99,10 +99,7 @@ public class WallpapersAdapter extends RecyclerView.Adapter<WallpapersAdapter.Wa
         holder.txtQuote.setTypeface(font);
         holder.txtQuote.setText(w.quote + "\n\n" + w.person);
         new WallpapersAdapter.JsonTask().execute(w.getQuote());
-        if (MainActivity.favoriteDatabase.favoriteDao().isFavorite(Integer.parseInt(w.getNo())) == 1)
-            holder.favBtn.setLiked(true);
-        else
-            holder.favBtn.setLiked(false);
+        holder.favBtn.setLiked(MainActivity.favoriteDatabase.favoriteDao().isFavorite(Integer.parseInt(w.getNo())) == 1);
 
         holder.favBtn.setOnLikeListener(new OnLikeListener() {
             @Override
@@ -146,7 +143,7 @@ public class WallpapersAdapter extends RecyclerView.Adapter<WallpapersAdapter.Wa
             }
         });
 
-        //Change Random Backgrounds
+        //Change Random Backgrounds s
         holder.relativeLayout.setOnClickListener(new View.OnClickListener() {
 
             @Override
