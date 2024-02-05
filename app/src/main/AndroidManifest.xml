@@ -39,12 +39,6 @@
         <activity
             android:name="com.dcq.quotesapp.NewQuoteActivity"
             android:theme="@style/AppTheme.NoActionBarNew" />
-        <activity
-            android:name="com.dcq.quotesapp.ViewPagerActivity"
-            android:theme="@style/AppTheme.NoActionBarNew" />
-        <activity
-            android:name="com.dcq.quotesapp.All_Inflater_Activity"
-            android:theme="@style/AppTheme.NoActionBarNew" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

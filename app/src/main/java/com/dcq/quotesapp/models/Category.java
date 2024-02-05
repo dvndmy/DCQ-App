@@ -2,12 +2,10 @@ package com.dcq.quotesapp.models;
 
 
 public class Category {
-    public String name, desc, thumb, quote;
+    public String name, thumb;
 
-    public Category(String name, String desc, String thumb) {
+    public Category(String name, String thumb) {
         this.name = name;
-        this.desc = desc;
         this.thumb = thumb;
-        this.quote = quote;
     }
 }

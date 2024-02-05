@@ -97,17 +97,17 @@ public class WallpapersAdapter extends RecyclerView.Adapter<WallpapersAdapter.Wa
         Typeface font = Typeface.createFromAsset(mCtx.getAssets(),
                 "fonts/montserrat_bold.ttf");
         holder.txtQuote.setTypeface(font);
-        holder.txtQuote.setText(w.quote + "\n\n" + w.person);
+        holder.txtQuote.setText(w.quote + "\n\n" + w.author);
         new WallpapersAdapter.JsonTask().execute(w.getQuote());
-        holder.favBtn.setLiked(MainActivity.favoriteDatabase.favoriteDao().isFavorite(Integer.parseInt(w.getNo())) == 1);
+        holder.favBtn.setLiked(MainActivity.favoriteDatabase.favoriteDao().isFavorite(Integer.parseInt(w.getId())) == 1);
 
         holder.favBtn.setOnLikeListener(new OnLikeListener() {
             @Override
             public void liked(LikeButton likeButton) {
                 FavoriteList favoriteList = new FavoriteList();
-                int id = Integer.parseInt(w.getNo());
+                int id = Integer.parseInt(w.getId());
                 String name = w.getQuote();
-                String person = w.getPerson();
+                String person = w.getAuthor();
                 favoriteList.setId(id);
                 favoriteList.setName(name);
                 favoriteList.setPerson(person);
@@ -125,9 +125,9 @@ public class WallpapersAdapter extends RecyclerView.Adapter<WallpapersAdapter.Wa
             @Override
             public void unLiked(LikeButton likeButton) {
                 FavoriteList favoriteList = new FavoriteList();
-                int id = Integer.parseInt(w.getNo());
+                int id = Integer.parseInt(w.getId());
                 String name = w.getQuote();
-                String person = w.getPerson();
+                String person = w.getAuthor();
                 favoriteList.setId(id);
                 favoriteList.setName(name);
                 favoriteList.setPerson(person);
@@ -278,7 +278,7 @@ public class WallpapersAdapter extends RecyclerView.Adapter<WallpapersAdapter.Wa
             @Override
             public void onClick(View v) {
                 ClipboardManager clipboard = (ClipboardManager) mCtx.getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("label", w.quote + " -" + w.person);
+                ClipData clip = ClipData.newPlainText("label", w.quote + " -" + w.author);
                 assert clipboard != null;
                 clipboard.setPrimaryClip(clip);
                 Toast.makeText(mCtx, "Quote Copied", Toast.LENGTH_SHORT).show();
@@ -302,7 +302,7 @@ public class WallpapersAdapter extends RecyclerView.Adapter<WallpapersAdapter.Wa
                             case R.id.sub_text:
                                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
                                 shareIntent.setType("text/plain");
-                                shareIntent.putExtra(Intent.EXTRA_TEXT, w.quote + "\n -" + w.person);
+                                shareIntent.putExtra(Intent.EXTRA_TEXT, w.quote + "\n -" + w.author);
                                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Daily Catholic Quotes");
                                 mCtx.startActivity(Intent.createChooser(shareIntent, "Share Quote"));
                                 Toast.makeText(mCtx, "Share as Text", Toast.LENGTH_SHORT).show();
@@ -316,7 +316,7 @@ public class WallpapersAdapter extends RecyclerView.Adapter<WallpapersAdapter.Wa
                                 Intent intent = new Intent(Intent.ACTION_SEND);
                                 intent.setType("*/*");
                                 intent.putExtra(Intent.EXTRA_STREAM, getLocalBitmapUri(bitmap));
-                                intent.putExtra(Intent.EXTRA_TEXT, w.quote + "\n -" + w.person);
+                                intent.putExtra(Intent.EXTRA_TEXT, w.quote + "\n -" + w.author);
                                 mCtx.startActivity(Intent.createChooser(intent, "Daily Catholic Quotes"));
                                 holder.tv_quotes_watermark.setVisibility(View.INVISIBLE);
                                 Toast.makeText(mCtx, "Share as Image", Toast.LENGTH_SHORT).show();

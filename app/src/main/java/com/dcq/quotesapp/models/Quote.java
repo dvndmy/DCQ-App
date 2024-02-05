@@ -4,37 +4,49 @@ import com.google.firebase.database.Exclude;
 
 import java.io.Serializable;
 
-
 public class Quote implements Serializable {
 
-    @Exclude
-    public String no;
-
-    public String quote, person, url;
-
-    @Exclude
+    // Use meaningful variable names and reorder for better readability
+    public String id;
+    public String quote;
+    public String author;
+    public String userAdded;
     public String quote_category;
 
+    // Exclude the 'id' field from Firebase database operations
     @Exclude
     public boolean isFavourite = false;
 
+    // Default constructor required for Firebase
     public Quote() {
     }
 
-    public Quote(String no, String quote, String person, String url, String quote_category) {
-        this.no = no;
+    // Constructor using String parameters
+    public Quote(String author, String id, String quote, String userAdded, String quote_category) {
+        this.id = id;
         this.quote = quote;
-        this.person = person;
-        this.url = url + "";
+        this.author = author;
+        this.userAdded = userAdded + "";
         this.quote_category = quote_category;
     }
 
-    public String getNo() {
-        return no;
+    // Constructor using Long parameters, converting to String where needed
+    public Quote(String author, Long id, String quote, Long userAdded, Long quote_category) {
+        this.id = id.toString();
+        this.quote = quote;
+        this.author = author;
+        this.userAdded = userAdded + "";
+        this.quote_category = quote_category.toString();
     }
 
-    public void setNo(String no) {
-        this.no = no;
+    // Getter and Setter methods for each field
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getQuote() {
@@ -45,20 +57,20 @@ public class Quote implements Serializable {
         this.quote = quote;
     }
 
-    public String getPerson() {
-        return person;
+    public String getAuthor() {
+        return author;
     }
 
-    public void setPerson(String person) {
-        this.person = person;
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
-    public String getUrl() {
-        return url;
+    public String getUserAdded() {
+        return userAdded;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setUserAdded(String userAdded) {
+        this.userAdded = userAdded;
     }
 
     public String getQuote_category() {

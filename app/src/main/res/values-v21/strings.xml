@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="category_uncategorised">Uncategorised</string>
+    <string name="category_catholic_people">Catholic People</string>
+    <string name="category_bible_verses">Bible Verses</string>
+    <string name="category_user_added">User Added</string>
+</resources>

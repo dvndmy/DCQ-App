@@ -1,7 +1,6 @@
 package com.dcq.quotesapp;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ContentResolver;
@@ -25,7 +24,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,7 +34,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.database.DataSnapshot;
@@ -65,10 +62,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Objects;
 
-
 public class NewQuoteActivity extends AppCompatActivity {
 
-    TextView quoteOfTheDay, category;
+    private final int STORAGE_PERMISSION_CODE = 1;
     TextView tv_quotes_watermark, tv_save_quote, likeText;
     LinearLayout layout_quote_header;
     String categorytext, quoteperson, quotes;
@@ -80,7 +76,7 @@ public class NewQuoteActivity extends AppCompatActivity {
     LikeButton favBtn;
     ArrayList<String> urlList;
     private DatabaseReference dbCategories, quote;
-    private int STORAGE_PERMISSION_CODE = 1;
+    TextView customQuote, category;
     private String[] images;
     private int imagesIndex = 0;
 
@@ -97,10 +93,8 @@ public class NewQuoteActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-
-        quoteOfTheDay = findViewById(R.id.txtQuote);
-        Typeface fontQuote = Typeface.createFromAsset(getAssets(),
-                "fonts/montserrat_bold.ttf");
+        customQuote = findViewById(R.id.txtQuote);
+        Typeface fontQuote = Typeface.createFromAsset(getAssets(), "fonts/montserrat_bold.ttf");
         imagesIndex = 0;
 
         ll_copy_quote = findViewById(R.id.ll_copy_quote);
@@ -110,7 +104,7 @@ public class NewQuoteActivity extends AppCompatActivity {
         iv_save_quote = findViewById(R.id.iv_save_quote);
         tv_save_quote = findViewById(R.id.tv_save_quote);
         tv_quotes_watermark = findViewById(R.id.tv_quotes_watermark);
-        quoteOfTheDay.setTypeface(fontQuote);
+        customQuote.setTypeface(fontQuote);
         category = findViewById(R.id.txtCategory);
         imgIcon = findViewById(R.id.imgIcon);
         imgview2 = findViewById(R.id.imageView2);
@@ -123,33 +117,17 @@ public class NewQuoteActivity extends AppCompatActivity {
         String searchterm = sharedPref.getString("searchterm", "");
         SharedPreferences sharedPreferences = getSharedPreferences("dbmax", MODE_PRIVATE);
         String no = sharedPreferences.getString("max", "3000");
-        no = String.valueOf((Integer.parseInt(no)));
-        quote = FirebaseDatabase.getInstance("https://dailycatholicquotes-2ef12-default-rtdb.europe-west1.firebasedatabase.app").getReference().child(no);
+        quote = FirebaseDatabase.getInstance("https://dailycatholicquotes-2ef12-default-rtdb.europe-west1.firebasedatabase.app").getReference().child("quotes").child(no);
         quote.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 Log.d("jjjjjjjjjjjjjjjjjj: ", "> " + dataSnapshot);
                 if (dataSnapshot.exists()) {
-
-                    //  Log.d("qqqqqqqqqqqq: ", "> " + dataSnapshot);
-                    //String name = ds.getKey();
-                    //   if(dataSnapshot.child("no").getKey()=="no") {
-                    //      quoteid = dataSnapshot.getValue(int.class);
-                    //       Log.d("eeeeeeeeeee: ", "hi ");
-                    //    }else
-                    //   if(dataSnapshot.child("quote").getKey()=="quote") {
                     quotes = dataSnapshot.child("quote").getValue(String.class);
-                    //       Log.d("eeeeeeeeeee: ", "bye ");
-                    //  }else if(dataSnapshot.child("person").getKey()=="person") {
-                    quoteperson = dataSnapshot.child("person").getValue(String.class);
-                    //  }else if(dataSnapshot.child("quote_category").getKey()=="quote_category") {
+                    quoteperson = dataSnapshot.child("author").getValue(String.class);
                     categorytext = dataSnapshot.child("quote_category").getValue(String.class);
-                    //   }
-//                        quotes = ds.getValue(String.class);
-//                        quoteperson = ds.child("person").getValue(String.class);
-//                        categorytext = ds.child("quote_category").getValue(String.class);
 
-                    quoteOfTheDay.setText(quotes + "\n\n" + quoteperson);
+                    customQuote.setText(quotes + "\n\n" + quoteperson);
                     Log.d("eeeeeeeeeee: ", quotes);
 
                     if(searchterm.isEmpty()){
@@ -157,11 +135,6 @@ public class NewQuoteActivity extends AppCompatActivity {
                     }else{
                         new JsonTask().execute(searchterm);
                     }
-
-//                    SharedPreferences sharedPreferences = getSharedPreferences("dbmax", MODE_PRIVATE);
-//                    SharedPreferences.Editor editor = sharedPreferences.edit();
-//                    editor.putString("max", String.valueOf(dataSnapshot.getChildrenCount() - 1));
-//                    editor.apply();
                 }
             }
 
@@ -171,11 +144,7 @@ public class NewQuoteActivity extends AppCompatActivity {
             }
         });
 
-
-        if (MainActivity.favoriteDatabase.favoriteDao().isFavorite(quoteid) == 1)
-            favBtn.setLiked(true);
-        else
-            favBtn.setLiked(false);
+        favBtn.setLiked(MainActivity.favoriteDatabase.favoriteDao().isFavorite(quoteid) == 1);
 
         favBtn.setOnLikeListener(new OnLikeListener() {
             @Override
@@ -219,13 +188,9 @@ public class NewQuoteActivity extends AppCompatActivity {
             }
         });
 
-
-        //Change Random Backgrounds
         relativeLayout.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
-
                 int numOfImages = urlList.size();
                 images = new String[numOfImages + 22];
                 for (int i = 0; i < numOfImages; i++) {
@@ -254,298 +219,166 @@ public class NewQuoteActivity extends AppCompatActivity {
                 images[numOfImages] = "https://images.unsplash.com/photo-1458682625221-3a45f8a844c7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80";
                 Glide.with(NewQuoteActivity.this).clear(imgview2);
                 Glide.with(NewQuoteActivity.this).load(images[imagesIndex]).into(imgview2);
-                //relativeLayout.setBackgroundResource(images[imagesIndex]);
-                ++imagesIndex;  // update index, so that next time it points to next resource
+                ++imagesIndex;
                 if (imagesIndex == images.length)
-                    imagesIndex = 0; // if we have reached at last index of array, simply restart from beginning
+                    imagesIndex = 0;
             }
         });
 
-        //when you press save button
         ll_quote_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 if (ContextCompat.checkSelfPermission(NewQuoteActivity.this,
                         Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-
                     tv_quotes_watermark.setVisibility(View.VISIBLE);
                     Bitmap bitmap = Bitmap.createBitmap(relativeLayout.getWidth(), relativeLayout.getHeight(),
                             Bitmap.Config.ARGB_8888);
                     Canvas canvas = new Canvas(bitmap);
                     relativeLayout.draw(canvas);
-
                     OutputStream fos;
-
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         ContentResolver resolver = getContentResolver();
                         ContentValues contentValues = new ContentValues();
                         contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, System.currentTimeMillis() + ".jpg");
                         contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "image/jpg");
-                        contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES);
+                        contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + File.separator + "Quotes");
                         Uri imageUri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
-
-                        Toast.makeText(NewQuoteActivity.this, "File Saved", Toast.LENGTH_SHORT).show();
-                        tv_save_quote.setText("Saved");
-                        iv_save_quote.setImageResource(R.drawable.ic_menu_check);
                         try {
                             fos = resolver.openOutputStream(Objects.requireNonNull(imageUri));
+                            if (fos != null) {
+                                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                                Objects.requireNonNull(fos);
+                                tv_quotes_watermark.setVisibility(View.GONE);
+                                Toast.makeText(NewQuoteActivity.this, "Image Saved Successfully", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        File imagesDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Quotes");
+                        if (!imagesDir.exists()) {
+                            imagesDir.mkdirs();
+                        }
+                        String fileName = System.currentTimeMillis() + ".jpg";
+                        File image = new File(imagesDir, fileName);
+                        try {
+                            fos = new FileOutputStream(image);
                             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-
                             fos.flush();
                             fos.close();
-
-
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
+                            tv_quotes_watermark.setVisibility(View.GONE);
+                            Toast.makeText(NewQuoteActivity.this, "Image Saved Successfully", Toast.LENGTH_SHORT).show();
+                            Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                            Uri contentUri = Uri.fromFile(image);
+                            mediaScanIntent.setData(contentUri);
+                            sendBroadcast(mediaScanIntent);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        tv_quotes_watermark.setVisibility(View.INVISIBLE);
-                    } else {
-
-                        FileOutputStream outputStream = null;
-
-                        File sdCard = Environment.getExternalStorageDirectory();
-
-                        File directory = new File(sdCard.getAbsolutePath() + "/Latest Quotes");
-                        directory.mkdir();
-
-                        String filename = String.format("%d.jpg", System.currentTimeMillis());
-
-                        File outFile = new File(directory, filename);
-
-                        Toast.makeText(NewQuoteActivity.this, "Saved", Toast.LENGTH_SHORT).show();
-                        tv_save_quote.setText("Saved");
-                        iv_save_quote.setImageResource(R.drawable.ic_menu_check);
-
-
-                        try {
-                            outputStream = new FileOutputStream(outFile);
-                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-
-                            outputStream.flush();
-                            outputStream.close();
-
-                            Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                            intent.setData(Uri.fromFile(outFile));
-                            sendBroadcast(intent);
-
-
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-                        tv_quotes_watermark.setVisibility(View.INVISIBLE);
-
                     }
-
                 } else {
-                    //show permission popup
                     requestStoragePermission();
                 }
-
             }
         });
 
-        //copy button
         ll_copy_quote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("label", quotes + " -" + quoteperson);
-                assert clipboard != null;
-                clipboard.setPrimaryClip(clip);
-                Toast.makeText(NewQuoteActivity.this, "Quote Copied", Toast.LENGTH_SHORT).show();
+                ClipData clip = ClipData.newPlainText("quote", quotes + "\n\n" + quoteperson);
+                if (clipboard != null) {
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(getApplicationContext(), "Quote Copied to Clipboard", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
-        //When You Press Share Button
         ll_quote_share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                popup();
-
-            }
-
-            private void popup() {
-                PopupMenu popup = new PopupMenu(NewQuoteActivity.this, ll_quote_share);
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem menuItem) {
-                        switch (menuItem.getItemId()) {
-                            case R.id.sub_text:
-                                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                                shareIntent.setType("text/plain");
-                                shareIntent.putExtra(Intent.EXTRA_TEXT, quotes + "\n -" + quoteperson);
-                                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Daily Catholic Quotes");
-                                startActivity(Intent.createChooser(shareIntent, "Share Quote"));
-                                Toast.makeText(NewQuoteActivity.this, "Share as Text", Toast.LENGTH_SHORT).show();
-                                return true;
-                            case R.id.sub_image:
-                                tv_quotes_watermark.setVisibility(View.VISIBLE);
-                                Bitmap bitmap = Bitmap.createBitmap(relativeLayout.getWidth(), relativeLayout.getHeight(),
-                                        Bitmap.Config.ARGB_8888);
-                                Canvas canvas = new Canvas(bitmap);
-                                relativeLayout.draw(canvas);
-                                Intent intent = new Intent(Intent.ACTION_SEND);
-                                intent.setType("*/*");
-                                intent.putExtra(Intent.EXTRA_STREAM, getLocalBitmapUri(bitmap));
-                                intent.putExtra(Intent.EXTRA_TEXT, quotes + "\n -" + quoteperson);
-                                startActivity(Intent.createChooser(intent, "Daily Catholic Quotes"));
-                                tv_quotes_watermark.setVisibility(View.INVISIBLE);
-                                Toast.makeText(NewQuoteActivity.this, "Share as Image", Toast.LENGTH_SHORT).show();
-
-                                return true;
-                        }
-                        return false;
-                    }
-                });
-                popup.inflate(R.menu.menu_item);
-
-                popup.show();
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                String shareBody = quotes + "\n\n" + quoteperson;
+                shareIntent.putExtra(Intent.EXTRA_TEXT, shareBody);
+                startActivity(Intent.createChooser(shareIntent, "Share using"));
             }
         });
     }
 
-
-    //Share image tool
-    private Uri getLocalBitmapUri(Bitmap bitmap) {
-        Uri bmpUri = null;
-        try {
-            File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-                    "Daily Catholic Quotes" + System.currentTimeMillis() + ".png");
-            FileOutputStream out = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-            out.close();
-            bmpUri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".provider", file);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return bmpUri;
-    }
-
     private void requestStoragePermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
             new AlertDialog.Builder(this)
                     .setTitle("Permission needed")
-                    .setMessage("This permission is needed")
-                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    .setMessage("This permission is needed to save the image to your device.")
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            ActivityCompat.requestPermissions((Activity) NewQuoteActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
+                            ActivityCompat.requestPermissions(NewQuoteActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
                         }
                     })
-                    .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
                         }
-                    }).create().show();
-
+                    })
+                    .create().show();
         } else {
-            ActivityCompat.requestPermissions((Activity) NewQuoteActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // handle arrow click here
-        if (item.getItemId() == android.R.id.home) {
-            finish(); // close this activity and return to preview activity (if there is any)
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    //Permisssion for save images
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == STORAGE_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                Toast.makeText(NewQuoteActivity.this, "Permission ok", Toast.LENGTH_SHORT).show();
-
-            } else
-
-                Toast.makeText(NewQuoteActivity.this, "Permission not allow", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Permission GRANTED", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Permission DENIED", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
-    public void deleteQuote(View view) {
-        SharedPreferences sharedPreferences = getSharedPreferences("dbmax", MODE_PRIVATE);
-        String no = sharedPreferences.getString("max", "3000");
-        Log.d("qqq7: ", sharedPreferences.getString("max", "lol"));
-        no = String.valueOf((Integer.parseInt(no)));
-        FirebaseDatabase.getInstance("https://dailycatholicquotes-2ef12-default-rtdb.europe-west1.firebasedatabase.app").getReference().child(no).removeValue();
-        Toast.makeText(NewQuoteActivity.this, "Quote Deleted", Toast.LENGTH_SHORT).show();
-finish();
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home)
+            finish();
+        return super.onOptionsItemSelected(item);
     }
 
-    class JsonTask extends AsyncTask<String, String, String> {
-        String data = "";
+    private class JsonTask extends AsyncTask<String, String, String> {
 
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
         protected String doInBackground(String... params) {
-
-
             HttpURLConnection connection = null;
             BufferedReader reader = null;
 
             try {
-                URL url = new URL("https", "api.unsplash.com", "/search/photos?query=" + params[0] + "&client_id=TWpsWTMSvOs4W7pH6J713NkqRh9jmXyZrIHrpmFpW-I");
-                //URL url = new URL(params[0]);
-                Log.d("eeeeeeeeeee: ", String.valueOf(url));
+                URL url = new URL("https://api.unsplash.com/search/photos?page=1&query=" + params[0] + "&client_id=YOUR_UNSPLASH_ACCESS_KEY");
                 connection = (HttpURLConnection) url.openConnection();
                 connection.connect();
 
-
                 InputStream stream = connection.getInputStream();
-
                 reader = new BufferedReader(new InputStreamReader(stream));
 
-                StringBuffer buffer = new StringBuffer();
-                String line = "";
-
+                StringBuilder buffer = new StringBuilder();
+                String line;
                 while ((line = reader.readLine()) != null) {
-                    buffer.append(line + "\n");
-                    data = data + line;
-                    //  Log.d("urls: ", "> " + line);   //here u ll get whole response...... :-)
-
+                    buffer.append(line).append("\n");
                 }
 
-                if (!data.isEmpty()) {
-                    JSONObject jsonObject = new JSONObject((data));
-                    JSONArray json;
-                    json = jsonObject.getJSONArray("results");
-                    //     Log.d("json: ", "> " + json);
-                    //urlList.clear();
-                    for (int i = 0; i < json.length(); i++) {
-                        JSONObject urls = json.getJSONObject(i);
-                        JSONObject imageurls = urls.getJSONObject("urls");
-                        String image = imageurls.getString("small");
-
-                        urlList.add(image);
-                        if (i == 10) {
-                            break;
-                        }
-                    }
-                }
-
-                //   Log.d("urllist: ", "> " + urlList);
                 return buffer.toString();
-
 
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
                 e.printStackTrace();
             } finally {
                 if (connection != null) {
@@ -566,7 +399,23 @@ finish();
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            // quoteOfTheDay.setText(quotes);
+            try {
+                JSONObject jsonObject = new JSONObject(result);
+                JSONArray resultsArray = jsonObject.getJSONArray("results");
+
+                for (int i = 0; i < resultsArray.length(); i++) {
+                    JSONObject photoObject = resultsArray.getJSONObject(i);
+                    String imageUrl = photoObject.getJSONObject("urls").getString("regular");
+                    urlList.add(imageUrl);
+                }
+
+                if (urlList.size() > 0) {
+                    Glide.with(NewQuoteActivity.this).load(urlList.get(0)).into(imgview2);
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

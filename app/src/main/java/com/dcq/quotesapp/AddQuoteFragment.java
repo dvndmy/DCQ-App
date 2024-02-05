@@ -26,13 +26,10 @@ import com.google.firebase.database.ValueEventListener;
 
 public class AddQuoteFragment extends Fragment {
 
-    //    private List<Category> categoryList;
-//    private AVLoadingIndicatorView progressBar;
-//    private DatabaseReference dbCategories;
-//
-//    private RecyclerView recyclerView;
-//    private PhotoCategoriesAdapter adapter;
+    // Flag to track errors during form submission
     Boolean noErrors = true;
+
+    // UI elements
     Button submit;
     EditText quote, person, search;
     CheckBox cperson, verse, other;
@@ -40,47 +37,51 @@ public class AddQuoteFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.activity_add_quote, container, false);
-
-
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        quote = (EditText) view.findViewById(R.id.et_quote);
-        search = (EditText) view.findViewById(R.id.et_search);
-        person = (EditText) view.findViewById(R.id.et_person);
-        cperson = (CheckBox) view.findViewById(R.id.cb_person);
-        verse = (CheckBox) view.findViewById(R.id.cb_verse);
-        other = (CheckBox) view.findViewById(R.id.cb_other);
+
+        // Initialize UI elements
+        quote = view.findViewById(R.id.et_quote);
+        search = view.findViewById(R.id.et_search);
+        person = view.findViewById(R.id.et_person);
+        cperson = view.findViewById(R.id.cb_person);
+        verse = view.findViewById(R.id.cb_verse);
+        other = view.findViewById(R.id.cb_other);
+        submit = view.findViewById(R.id.btn_save);
+
+        // Set click listeners for checkboxes and submit button
         cperson.setOnClickListener(this::onPersonClick);
         verse.setOnClickListener(this::onVerseClick);
         other.setOnClickListener(this::onOtherClick);
-        submit = (Button) view.findViewById(R.id.btn_save);
         submit.setOnClickListener(this::OnSubmit);
     }
 
+    // Handle checkbox clicks
     public void onPersonClick(View view) {
-        cperson.setChecked(true);
-        verse.setChecked(false);
-        other.setChecked(false);
+        setCategoryCheckBoxes(true, false, false);
     }
 
     public void onVerseClick(View view) {
-
-        cperson.setChecked(false);
-        verse.setChecked(true);
-        other.setChecked(false);
+        setCategoryCheckBoxes(false, true, false);
     }
 
     public void onOtherClick(View view) {
-
-        cperson.setChecked(false);
-        verse.setChecked(false);
-        other.setChecked(true);
+        setCategoryCheckBoxes(false, false, true);
     }
 
+    // Helper method to set category checkboxes
+    private void setCategoryCheckBoxes(boolean personChecked, boolean verseChecked, boolean otherChecked) {
+        cperson.setChecked(personChecked);
+        verse.setChecked(verseChecked);
+        other.setChecked(otherChecked);
+    }
+
+    // Handle form submission
     public void OnSubmit(View view) {
         String str_quote = quote.getText().toString();
         String str_person = person.getText().toString();
@@ -94,18 +95,23 @@ public class AddQuoteFragment extends Fragment {
         } else {
             category = "0";
         }
+
+        // Save the search term in SharedPreferences
         SharedPreferences sharedPref = getContext().getSharedPreferences("search", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("searchterm", str_search);
         editor.apply();
 
-        //Verifies that users have entered in all the required fields before registering a quote
+        // Verifies that users have entered all the required fields before registering a quote
         if (checkEnteredData()) {
-            DatabaseReference db = FirebaseDatabase.getInstance("https://dailycatholicquotes-2ef12-default-rtdb.europe-west1.firebasedatabase.app").getReference();
+            DatabaseReference db = FirebaseDatabase.getInstance("https://dailycatholicquotes-2ef12-default-rtdb.europe-west1.firebasedatabase.app")
+                    .getReference().child("quotes");
+
+            // Retrieve the count of existing quotes for generating a new quote number
             db.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
+                    // Update the maximum quote number in SharedPreferences
                     SharedPreferences sharedPreferences = getContext().getSharedPreferences("dbmax", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("max", String.valueOf(dataSnapshot.getChildrenCount() + 1));
@@ -114,44 +120,56 @@ public class AddQuoteFragment extends Fragment {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                    // Handle database error if needed
                 }
             });
-            SharedPreferences sharedPreferences = this.getActivity().getSharedPreferences("dbmax", Context.MODE_PRIVATE);
+
+            SharedPreferences sharedPreferences = getActivity().getSharedPreferences("dbmax", Context.MODE_PRIVATE);
             String no = sharedPreferences.getString("max", "5001");
-            Quote quotetoadd = new Quote(no, str_quote, str_person, "User Added", category);
-            db.child("quotes/"+no).setValue(quotetoadd);
-            Toast.makeText(this.getActivity().getApplicationContext(), "Added to Database", Toast.LENGTH_SHORT).show();
+
+            // Create a new Quote object
+            Quote quotetoadd = new Quote(str_person, no, str_quote, "1", category);
+
+            // Add the new quote to the database
+            db.child(no).setValue(quotetoadd);
+
+            // Display success message and start a new activity
+            Toast.makeText(getActivity().getApplicationContext(), "Added to Database", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(getActivity(), NewQuoteActivity.class));
-
         } else {
-            Toast.makeText(this.getActivity().getApplicationContext(), "Please make sure you have filled all fields correctly", Toast.LENGTH_SHORT).show();
+            // Display an error message if required fields are not filled
+            Toast.makeText(getActivity().getApplicationContext(), "Please make sure you have filled all fields correctly", Toast.LENGTH_SHORT).show();
         }
-
-
     }
 
-    //Verifies that users have entered all required fields
+    // Verifies that users have entered all required fields
     Boolean checkEnteredData() {
         noErrors = true;
+
+        // Check if the quote field is empty
         if (isEmpty(quote)) {
             noErrors = false;
             quote.setError("Quote is required!");
         }
+
+        // Check if the person/verse field is empty
         if (isEmpty(person)) {
             noErrors = false;
             person.setError("Person/verse is required!");
         }
 
-        if (cperson.isChecked() == false && verse.isChecked() == false && other.isChecked() == false) {
+        // Check if at least one category checkbox is selected
+        if (!cperson.isChecked() && !verse.isChecked() && !other.isChecked()) {
             noErrors = false;
             cperson.setError("Select one!");
             verse.setError("Select one!");
             other.setError("Select one!");
         }
+
         return noErrors;
     }
 
+    // Helper method to check if an EditText is empty
     boolean isEmpty(EditText text) {
         CharSequence str = text.getText().toString();
         return TextUtils.isEmpty(str);

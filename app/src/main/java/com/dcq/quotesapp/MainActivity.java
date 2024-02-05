@@ -33,7 +33,10 @@ import com.onesignal.OneSignal;
 
 public class MainActivity extends AppCompatActivity {
 
+    // Database instance
     public static FavoriteDatabase favoriteDatabase;
+
+    // UI elements
     DrawerLayout drawerLayout;
     Toolbar toolbar;
     NavigationView navigationView;
@@ -51,43 +54,66 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Initialize toolbar and UI elements
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         relativeLayout = findViewById(R.id.rootPager);
         relativeLayout.setVisibility(View.VISIBLE);
 
-
         // OneSignal Initialization
+        initializeOneSignal();
+
+        // Initialize Room database
+        initializeRoomDatabase();
+
+        // Set up custom drawer
+        setupCustomDrawer();
+
+        // Set up main Fragment
+        setupMainFragment();
+
+        // Set up Drawer Menu Click Listener
+        setupDrawerMenuClickListener();
+    }
+
+    // Helper method to initialize OneSignal
+    private void initializeOneSignal() {
         OneSignal.startInit(this)
                 .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
                 .unsubscribeWhenNotificationsAreDisabled(true)
                 .init();
+    }
 
-        favoriteDatabase = Room.databaseBuilder(getApplicationContext(), FavoriteDatabase.class, "myfavdb").allowMainThreadQueries().build();
+    // Helper method to initialize Room database
+    private void initializeRoomDatabase() {
+        favoriteDatabase = Room.databaseBuilder(getApplicationContext(), FavoriteDatabase.class, "myfavdb")
+                .allowMainThreadQueries()
+                .build();
+    }
 
-        //Custom Drawer
+    // Helper method to set up custom drawer
+    private void setupCustomDrawer() {
         drawerLayout = findViewById(R.id.drawer_layout);
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
         actionBarDrawerToggle.syncState();
+    }
 
-
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawerLayout.addDrawerListener(actionBarDrawerToggle);
-        actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
-        actionBarDrawerToggle.syncState();
-
-        //main Fragment
+    // Helper method to set up main Fragment
+    private void setupMainFragment() {
         tabLayout = findViewById(R.id.tabLayout);
         viewPager = findViewById(R.id.viewPager);
         tabLayout.addTab(tabLayout.newTab().setText("Quotes"));
         tabLayout.addTab(tabLayout.newTab().setText("Add Quote"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+
         final TabAdapter adapter = new TabAdapter(this, getSupportFragmentManager(),
                 tabLayout.getTabCount());
         viewPager.setAdapter(adapter);
+
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -103,8 +129,10 @@ public class MainActivity extends AppCompatActivity {
             public void onTabReselected(TabLayout.Tab tab) {
             }
         });
+    }
 
-        //Drawer Menu Click Listner
+    // Helper method to set up Drawer Menu Click Listener
+    private void setupDrawerMenuClickListener() {
         ll_liked_quotes = findViewById(R.id.ll_liked_quotes);
         ll_todays_quote = findViewById(R.id.ll_todays_quote);
         ll_sounds = findViewById(R.id.ll_sounds);
@@ -116,7 +144,6 @@ public class MainActivity extends AppCompatActivity {
         ll_follow_insta = findViewById(R.id.ll_follow_insta);
         ll_privacy_policy = findViewById(R.id.ll_privacy_policy);
 
-        //show your favorite quotes
         ll_liked_quotes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -124,7 +151,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //quote of the day
         ll_todays_quote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -132,8 +158,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-        //about my app
         ll_about.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -141,31 +165,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-        //like my facebook page
         ll_like_fb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse("http://www.facebook.com/" + Config.usernameFacebook));
-                startActivity(browserIntent);
+                openFacebookPage();
             }
         });
 
-        //follow on instagram
         ll_follow_insta.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse("http://www.instagram.com/" + Config.usernameInstagram));
-                startActivity(browserIntent);
+                openInstagramPage();
             }
         });
-
-
     }
 
-
+    // Helper method to show the about dialog
     private void showAboutDialog() {
         final Dialog dialog = new Dialog(MainActivity.this, R.style.DialogCustomTheme);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -182,30 +197,41 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    // Helper method to open the Facebook page
+    private void openFacebookPage() {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("http://www.facebook.com/" + Config.usernameFacebook));
+        startActivity(browserIntent);
+    }
+
+    // Helper method to open the Instagram page
+    private void openInstagramPage() {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("http://www.instagram.com/" + Config.usernameInstagram));
+        startActivity(browserIntent);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_settings:
                 startActivity(new Intent(MainActivity.this, FavoriteListActivity.class));
-
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
+    // Helper method to show the exit dialog
     private void showExit() {
-
         final Dialog customDialog;
-        LayoutInflater inflater = (LayoutInflater) getLayoutInflater();
+        LayoutInflater inflater = getLayoutInflater();
         View customView = inflater.inflate(R.layout.layout_exit, null);
         customDialog = new Dialog(this, R.style.CustomDialog);
         customDialog.setContentView(customView);
@@ -226,7 +252,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Exit", Toast.LENGTH_SHORT).show();
             }
         });
-
 
         customDialog.show();
     }
