@@ -1,8 +1,8 @@
-# ImageQuoteGenerator App
+# Daily Catholic Quotes App
 
 ## Overview
 
-The ImageQuoteGenerator app is an Android application that allows users to create visually appealing quote images by combining quotes with beautiful background images fetched from Unsplash. Users can save, copy, and share these quote images.
+The DCQ app is an Android application that allows users to create visually appealing quote images by combining quotes with beautiful background images fetched from Unsplash. Users can save, copy, and share these quote images.
 
 ## Features
 
