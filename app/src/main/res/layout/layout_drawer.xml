@@ -288,6 +288,114 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/ll_join_tg"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="10.0dip"
+                android:paddingBottom="10.0dip">
+
+                <ImageView
+                    android:layout_width="25.0dip"
+                    android:layout_height="25.0dip"
+                    android:layout_gravity="center_vertical"
+                    android:contentDescription="@string/app_name"
+                    android:padding="2.0dip"
+                    app:srcCompat="@drawable/ic_menu_telegram" />
+
+                <TextView
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="10.0dip"
+                    android:layout_weight="1.0"
+                    android:text="@string/join_telegram"
+                    android:textColor="@color/lightBlack" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_follow_twitter"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="10.0dip"
+                android:paddingBottom="10.0dip">
+
+                <ImageView
+                    android:layout_width="25.0dip"
+                    android:layout_height="25.0dip"
+                    android:layout_gravity="center_vertical"
+                    android:contentDescription="@string/app_name"
+                    android:padding="2.0dip"
+                    android:src="@drawable/ic_menu_twitter" />
+
+                <TextView
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="10.0dip"
+                    android:layout_weight="1.0"
+                    android:text="@string/follow_on_twitter"
+                    android:textColor="@color/lightBlack" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_subscribe_youtube"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="10.0dip"
+                android:paddingBottom="10.0dip">
+
+                <ImageView
+                    android:layout_width="25.0dip"
+                    android:layout_height="25.0dip"
+                    android:layout_gravity="center_vertical"
+                    android:contentDescription="@string/app_name"
+                    android:padding="2.0dip"
+                    app:srcCompat="@drawable/ic_menu_youtube" />
+
+                <TextView
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="10.0dip"
+                    android:layout_weight="1.0"
+                    android:text="@string/subscribe_yt"
+                    android:textColor="@color/lightBlack" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_send_email"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="10.0dip"
+                android:paddingBottom="10.0dip">
+
+                <ImageView
+                    android:layout_width="25.0dip"
+                    android:layout_height="25.0dip"
+                    android:layout_gravity="center_vertical"
+                    android:contentDescription="@string/app_name"
+                    android:padding="2.0dip"
+                    android:src="@drawable/ic_menu_email" />
+
+                <TextView
+                    android:layout_width="0.0dip"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginStart="10.0dip"
+                    android:layout_weight="1.0"
+                    android:text="@string/send_email"
+                    android:textColor="@color/lightBlack" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/ll_privacy_policy"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"

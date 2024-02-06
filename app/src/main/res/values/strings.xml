@@ -63,4 +63,8 @@
     <string name="category_catholic_people">Catholic People</string>
     <string name="category_bible_verses">Bible Verses</string>
     <string name="category_user_added">User Added</string>
+    <string name="join_telegram">Join Telegram Channel</string>
+    <string name="follow_on_twitter">Follow on Twitter</string>
+    <string name="subscribe_yt">Subscribe on YouTube</string>
+    <string name="send_email">Email the Developer</string>
 </resources>

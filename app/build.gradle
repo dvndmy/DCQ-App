@@ -2,11 +2,8 @@ buildscript {
     repositories {
         maven { url 'https://plugins.gradle.org/m2/' }
     }
-    dependencies {
-        classpath 'gradle.plugin.com.onesignal:onesignal-gradle-plugin:[0.12.4, 0.99.99]'
-    }
+
 }
-apply plugin: 'com.onesignal.androidsdk.onesignal-gradle-plugin'
 
 repositories {
     maven { url 'https://maven.google.com' }
@@ -20,15 +17,6 @@ android {
 
     defaultConfig {
         applicationId "com.dcq.quotesapp"
-        android {
-            defaultConfig {
-                manifestPlaceholders = [
-                        onesignal_app_id               : 'd84871d1-6132-40dd-9236-1356b2762756',
-                        // Project number pulled from dashboard, local value is ignored.
-                        onesignal_google_project_number: 'REMOTE'
-                ]
-            }
-        }
         minSdkVersion 21
         targetSdkVersion 29
         versionCode 1
@@ -79,8 +67,6 @@ dependencies {
     //save fav
     implementation "android.arch.persistence.room:runtime:1.0.0"
     annotationProcessor "android.arch.persistence.room:compiler:1.0.0"
-    //one signal
-    implementation 'com.onesignal:OneSignal:[3.13.0, 3.99.99]'
 
     implementation 'com.github.bumptech.glide:glide:4.13.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.13.0'

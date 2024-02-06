@@ -29,7 +29,7 @@ import com.dcq.quotesapp.adapters.TabAdapter;
 import com.google.android.gms.ads.AdView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
-import com.onesignal.OneSignal;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     ViewPager viewPager;
     private AlertDialog dialog;
     private AdView mAdView;
-    private LinearLayout ll_liked_quotes, ll_todays_quote, ll_sounds, ll_about, ll_contact_us, ll_rate_app, ll_share_app, ll_like_fb, ll_follow_insta, ll_privacy_policy;
+    private LinearLayout ll_liked_quotes, ll_todays_quote, ll_sounds, ll_about, ll_contact_us, ll_rate_app, ll_share_app, ll_like_fb, ll_follow_insta, ll_telegram, ll_youtube, ll_twitter, ll_email;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,8 +62,6 @@ public class MainActivity extends AppCompatActivity {
         relativeLayout = findViewById(R.id.rootPager);
         relativeLayout.setVisibility(View.VISIBLE);
 
-        // OneSignal Initialization
-        initializeOneSignal();
 
         // Initialize Room database
         initializeRoomDatabase();
@@ -78,13 +76,6 @@ public class MainActivity extends AppCompatActivity {
         setupDrawerMenuClickListener();
     }
 
-    // Helper method to initialize OneSignal
-    private void initializeOneSignal() {
-        OneSignal.startInit(this)
-                .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
-                .unsubscribeWhenNotificationsAreDisabled(true)
-                .init();
-    }
 
     // Helper method to initialize Room database
     private void initializeRoomDatabase() {
@@ -133,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Helper method to set up Drawer Menu Click Listener
     private void setupDrawerMenuClickListener() {
+        // Find views
         ll_liked_quotes = findViewById(R.id.ll_liked_quotes);
         ll_todays_quote = findViewById(R.id.ll_todays_quote);
         ll_sounds = findViewById(R.id.ll_sounds);
@@ -142,8 +134,12 @@ public class MainActivity extends AppCompatActivity {
         ll_share_app = findViewById(R.id.ll_share_app);
         ll_like_fb = findViewById(R.id.ll_like_fb);
         ll_follow_insta = findViewById(R.id.ll_follow_insta);
-        ll_privacy_policy = findViewById(R.id.ll_privacy_policy);
+        ll_telegram = findViewById(R.id.ll_join_tg);
+        ll_youtube = findViewById(R.id.ll_subscribe_youtube);
+        ll_twitter = findViewById(R.id.ll_follow_twitter);
+        ll_email = findViewById(R.id.ll_send_email);
 
+        // Set click listeners
         ll_liked_quotes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -178,6 +174,34 @@ public class MainActivity extends AppCompatActivity {
                 openInstagramPage();
             }
         });
+
+        ll_telegram.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openTelegramChannel();
+            }
+        });
+
+        ll_youtube.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openYouTubeChannel();
+            }
+        });
+
+        ll_twitter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openTwitterPage();
+            }
+        });
+
+        ll_email.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendEmail();
+            }
+        });
     }
 
     // Helper method to show the about dialog
@@ -209,6 +233,34 @@ public class MainActivity extends AppCompatActivity {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW,
                 Uri.parse("http://www.instagram.com/" + Config.usernameInstagram));
         startActivity(browserIntent);
+    }
+
+    // Helper method to open the Telegram channel
+    private void openTelegramChannel() {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("https://t.me/dailycatholicqu"));
+        startActivity(browserIntent);
+    }
+
+    // Helper method to open the YouTube channel
+    private void openYouTubeChannel() {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("https://www.youtube.com/" + Config.youtubeChannel));
+        startActivity(browserIntent);
+    }
+
+    // Helper method to open the Twitter page
+    private void openTwitterPage() {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("https://twitter.com/" + Config.twitterUsername));
+        startActivity(browserIntent);
+    }
+
+    // Helper method to send an email
+    private void sendEmail() {
+        Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + Config.emailAddress));
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Feedback / Inquiry");
+        startActivity(Intent.createChooser(emailIntent, "Send email..."));
     }
 
     @Override

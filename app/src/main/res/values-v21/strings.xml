@@ -1,7 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Daily Catholic Quotes</string>
+
+    <string name="app_id">ca-app-pub-3940256099942544~3347511713</string>
+
+    <string name="developers_name">Divin Domy</string>
+    <string name="app_description">Daily Catholic Quotes app is an android application for all your Catholic quote needs!</string>
+    <string name="ratethisapp_msg">If you like this app.Please take a moment to rate it. It would\'t take more than a minute.\nEnjoy!</string>
+    <string name="ratethisapp_title">Rate Us</string>
+    <string name="rate_it">Rate it</string>
+    <string name="cancel">Cancel</string>
+
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+
+    <string name="home_second">Home Second</string>
+    <string name="quote_of_the_day">Quote of the Day</string>
+    <string name="submit">Submit</string>
+    <string name="about_us">About Us</string>
+    <string name="close">close</string>
+    <string name="enter_the_quote">Enter the Quote:</string>
+    <string name="bible_verse">Bible Verse</string>
+    <string name="other">Other</string>
+    <string name="catholic_person">Catholic Person</string>
+    <string name="enter_person_verse">Enter person/verse:</string>
+    <string name="search_term_for_photos_optional">Search term for photos: (Optional)</string>
+    <string name="add_quote">Add Quote:</string>
+    <string name="no_favorite">No Favorite</string>
+    <string name="no_quotes_found">no quotes found</string>
+    <string name="delete_quote_from_database">Delete Quote from Database</string>
+    <string name="like">Like</string>
+    <string name="save">Save</string>
+    <string name="copy">Copy</string>
+    <string name="share">Share</string>
+    <string name="quote_background">quote background</string>
+    <string name="start_quote_mark">Start quote mark</string>
+    <string name="end_quote_mark">End quote mark</string>
+    <string name="liked_quotes">Liked Quotes</string>
+    <string name="setting">Setting</string>
+    <string name="give_star">Give Star</string>
+    <string name="contact_us">Contact Us</string>
+    <string name="share_app">Share App</string>
+    <string name="like_on_facebook">Like on Facebook</string>
+    <string name="follow_on_instagram">Follow on Instagram</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="exit">Exit</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="do_you_want_to_exit">Do you want to exit?</string>
+    <string name="ad">Ad</string>
+    <string name="favorite">Favorite</string>
     <string name="category_uncategorised">Uncategorised</string>
     <string name="category_catholic_people">Catholic People</string>
     <string name="category_bible_verses">Bible Verses</string>
     <string name="category_user_added">User Added</string>
+    <string name="join_telegram">Join Telegram Channel</string>
+    <string name="follow_on_twitter">Follow on Twitter</string>
+    <string name="subscribe_yt">Subscribe on YouTube</string>
+    <string name="send_email">Email the Developer</string>
 </resources>

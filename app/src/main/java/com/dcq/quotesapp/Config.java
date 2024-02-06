@@ -7,7 +7,9 @@ public class Config {
     //Social Link - Put your Username only
     public static final String usernameFacebook = "DailyCatholicQuote";
     public static final String usernameInstagram = "DailyCatholicQu";
-
+    public static final String youtubeChannel = "@dailycatholicquotes";
+    public static final String twitterUsername = "dailycatholicqu";
+    public static final String emailAddress = "dailycatholicqu@gmail.com";
 
     //Contact us Details
     public static final String contactUsEmail = "contact@dcq.com";
@@ -16,5 +18,7 @@ public class Config {
 
     //Abmob ads - if you want remove ads put value "false"  //remove commas
     public static boolean showAdmobAds = false;
+
+
 
 }
