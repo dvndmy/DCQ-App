@@ -29,6 +29,7 @@ import com.dcq.quotesapp.adapters.TabAdapter;
 import com.google.android.gms.ads.AdView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.FirebaseApp;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        FirebaseApp.initializeApp(this);
 
         // Initialize toolbar and UI elements
         toolbar = findViewById(R.id.toolbar);
@@ -74,7 +76,11 @@ public class MainActivity extends AppCompatActivity {
 
         // Set up Drawer Menu Click Listener
         setupDrawerMenuClickListener();
+
+// Call setReminder method
+        NotificationScheduler.setReminder(this, MainActivity.class);
     }
+
 
 
     // Helper method to initialize Room database
@@ -282,31 +288,35 @@ public class MainActivity extends AppCompatActivity {
 
     // Helper method to show the exit dialog
     private void showExit() {
-        final Dialog customDialog;
-        LayoutInflater inflater = getLayoutInflater();
-        View customView = inflater.inflate(R.layout.layout_exit, null);
-        customDialog = new Dialog(this, R.style.CustomDialog);
-        customDialog.setContentView(customView);
-        TextView no = customDialog.findViewById(R.id.tv_no);
-        TextView yes = customDialog.findViewById(R.id.tv_yes);
+        // Check if the activity is finishing or is destroyed
+        if (!isFinishing()) {
+            final Dialog customDialog;
+            LayoutInflater inflater = getLayoutInflater();
+            View customView = inflater.inflate(R.layout.layout_exit, null);
+            customDialog = new Dialog(this, R.style.CustomDialog);
+            customDialog.setContentView(customView);
+            TextView no = customDialog.findViewById(R.id.tv_no);
+            TextView yes = customDialog.findViewById(R.id.tv_yes);
 
-        no.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                customDialog.dismiss();
-            }
-        });
+            no.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    customDialog.dismiss();
+                }
+            });
 
-        yes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-                Toast.makeText(MainActivity.this, "Exit", Toast.LENGTH_SHORT).show();
-            }
-        });
+            yes.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                    Toast.makeText(MainActivity.this, "Exit", Toast.LENGTH_SHORT).show();
+                }
+            });
 
-        customDialog.show();
+            customDialog.show();
+        }
     }
+
 
     @Override
     public void onBackPressed() {
