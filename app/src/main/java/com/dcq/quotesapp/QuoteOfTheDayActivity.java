@@ -1,7 +1,6 @@
 package com.dcq.quotesapp;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ContentResolver;
@@ -79,7 +78,7 @@ public class QuoteOfTheDayActivity extends AppCompatActivity {
     LikeButton favBtn;
     ArrayList<String> urlList;
     private DatabaseReference dbCategories, quote;
-    private int STORAGE_PERMISSION_CODE = 1;
+    private final int STORAGE_PERMISSION_CODE = 1;
     private String[] images;
     private int imagesIndex = 0;
 
@@ -136,7 +135,7 @@ public class QuoteOfTheDayActivity extends AppCompatActivity {
                     quotes = dataSnapshot.child("quote").getValue(String.class);
                     //       Log.d("eeeeeeeeeee: ", "bye ");
                     //  }else if(dataSnapshot.child("person").getKey()=="person") {
-                    quoteperson = dataSnapshot.child("person").getValue(String.class);
+                    quoteperson = dataSnapshot.child("author").getValue(String.class);
                     //  }else if(dataSnapshot.child("quote_category").getKey()=="quote_category") {
                     categorytext = dataSnapshot.child("quote_category").getValue(String.class);
                     //   }
@@ -161,10 +160,7 @@ public class QuoteOfTheDayActivity extends AppCompatActivity {
         });
 
 
-        if (MainActivity.favoriteDatabase.favoriteDao().isFavorite(quoteid) == 1)
-            favBtn.setLiked(true);
-        else
-            favBtn.setLiked(false);
+        favBtn.setLiked(MainActivity.favoriteDatabase.favoriteDao().isFavorite(quoteid) == 1);
 
         favBtn.setOnLikeListener(new OnLikeListener() {
             @Override
@@ -420,7 +416,7 @@ public class QuoteOfTheDayActivity extends AppCompatActivity {
     }
 
     private void requestStoragePermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
 
             new AlertDialog.Builder(this)
                     .setTitle("Permission needed")
@@ -428,7 +424,7 @@ public class QuoteOfTheDayActivity extends AppCompatActivity {
                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            ActivityCompat.requestPermissions((Activity) QuoteOfTheDayActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
+                            ActivityCompat.requestPermissions(QuoteOfTheDayActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
                         }
                     })
                     .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
@@ -439,7 +435,7 @@ public class QuoteOfTheDayActivity extends AppCompatActivity {
                     }).create().show();
 
         } else {
-            ActivityCompat.requestPermissions((Activity) QuoteOfTheDayActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
+            ActivityCompat.requestPermissions(QuoteOfTheDayActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
         }
     }
 
