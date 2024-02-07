@@ -1,19 +1,18 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    
     repositories {
         google()
         jcenter()
-        
+        // Add the Apache OpenNLP repository
+        maven {
+            url "https://repository.apache.org/content/repositories/releases/"
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.1.1'
         classpath 'com.google.gms:google-services:4.3.10'
-        
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        // Add any other dependencies you need here
     }
 }
 
@@ -22,7 +21,11 @@ allprojects {
         google()
         jcenter()
         mavenCentral()
-        maven { url "https://jitpack.io" }
+        maven { url "https://jitpack.io"}
+        // Add the Apache OpenNLP repository here as well if needed
+        maven {
+            url "https://repository.apache.org/content/repositories/releases/"
+        }
     }
 }
 
