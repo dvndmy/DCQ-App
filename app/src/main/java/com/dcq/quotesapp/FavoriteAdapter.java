@@ -59,7 +59,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHolder> implements ActivityCompat.OnRequestPermissionsResultCallback {
     private static final int REQUEST_STORAGE_PERMISSION_CODE = 1;
     private final Context context;
-    private final List<FavoriteList> favoriteList;
+    private List<FavoriteList> favoriteList;
     private String[] images;
     private final UnsplashApi unsplashApi;
     private ArrayList<String> imageUrlList;
@@ -74,6 +74,12 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
                 .build();
 
         unsplashApi = retrofit.create(UnsplashApi.class);
+    }
+
+    // Method to update the filtered list and notify the adapter
+    public void filterList(List<FavoriteList> filteredList) {
+        this.favoriteList = new ArrayList<>(filteredList);
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -435,6 +441,8 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
             ll_copy_quote = itemView.findViewById(R.id.ll_copy_quote);
             ll_quote_share = itemView.findViewById(R.id.ll_quote_share);
             favBtn = itemView.findViewById(R.id.favBtn);
+            imgview2 = itemView.findViewById(R.id.imageView2);
+
         }
     }
 }
