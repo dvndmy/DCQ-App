@@ -14,6 +14,7 @@ The DCQ app is an Android application that allows users to create visually appea
 - **Save to Device**: Save the created quote images to the user's device storage.
 - **Copy to Clipboard**: Copy the quote text to the clipboard for easy sharing or pasting elsewhere.
 - **Share on Social Media**: Share the generated quote images on social media platforms.
+- **Search Functionality**: Implement search functionality to allow users to search for specific quotes.
 
 ## Getting Started
 
@@ -40,6 +41,7 @@ The DCQ app is an Android application that allows users to create visually appea
 
 1. Open the app, and the quote of the day will be fetched and displayed.
 2. If the app is running, you will receive a notification with the daily quote.
+3. Utilize the search functionality by pressing the search button in the toolbar to search for specific quotes.
 
 ## Permissions
 
