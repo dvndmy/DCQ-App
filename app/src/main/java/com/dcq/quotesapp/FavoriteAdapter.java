@@ -47,8 +47,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -59,10 +63,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHolder> implements ActivityCompat.OnRequestPermissionsResultCallback {
     private static final int REQUEST_STORAGE_PERMISSION_CODE = 1;
     private final Context context;
+    private final UnsplashApi unsplashApi;
+    private final HashMap<Integer, ArrayList> imageUrlList = new HashMap<>();
+    private final HashMap<Integer, Integer> imgindex = new HashMap<>();
     private List<FavoriteList> favoriteList;
     private String[] images;
-    private final UnsplashApi unsplashApi;
-    private ArrayList<String> imageUrlList;
+    private ArrayList<String> imageUrls;
     private int imageIndex = 0;
 
     public FavoriteAdapter(List<FavoriteList> favoriteList, Context context) {
@@ -72,8 +78,39 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
                 .baseUrl("https://api.unsplash.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-
         unsplashApi = retrofit.create(UnsplashApi.class);
+    }
+
+    public static String removeCommonWords(String input) {
+        // Define a set of common words to remove
+        Set<String> commonWords = new HashSet<>(Arrays.asList(
+                "the", "a", "an", "and", "but", "or", "for", "nor", "so", "yet",
+                "is", "am", "are", "was", "were", "be", "being", "been",
+                "I", "you", "he", "she", "it", "we", "they",
+                "my", "your", "his", "her", "its", "our", "their",
+                "this", "that", "these", "those",
+                "here", "there", "where",
+                "who", "whom", "whose",
+                "which", "what", "whose", "whom",
+                "how", "when", "why", "whether", "while", "whilst", "because", "since",
+                "upon", "onto", "into", "through", "though", "although", "against", "around", "among",
+                "above", "below", "beneath", "beside", "between", "before", "after", "without", "within", "with",
+                "to", "from", "of", "off", "by", "as", "at", "about", "up", "down", "over", "under"
+        ));
+
+        // Split the input string into words
+        String[] words = input.split("\\s+"); // Split by whitespace
+
+        // Filter out common words
+        StringBuilder result = new StringBuilder();
+        for (String word : words) {
+            if (!commonWords.contains(word.toLowerCase())) {
+                result.append(word).append(" "); // Append non-common words with a space
+            }
+        }
+
+        // Remove trailing space and return the result
+        return result.toString().trim();
     }
 
     // Method to update the filtered list and notify the adapter
@@ -92,13 +129,12 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int i) {
         final FavoriteList favoriteItem = favoriteList.get(i);
-        imageUrlList = new ArrayList<>();
-
         Typeface font = Typeface.createFromAsset(context.getAssets(), "fonts/montserrat_bold.ttf");
         holder.txtQuote.setTypeface(font);
-
+        imgindex.put(i, 0);
         holder.txtQuote.setText(favoriteItem.getName() + "\n\n" + favoriteItem.getPerson());
 
+        searchPhotos(removeCommonWords(favoriteItem.getName() + " " + favoriteItem.getPerson()), i);
         // Handle favorite button state
         holder.favBtn.setLiked(MainActivity.favoriteDatabase.favoriteDao().isFavorite(favoriteItem.getId()) == 1);
 
@@ -129,39 +165,23 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
         holder.relativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                searchPhotos(favoriteItem.getName() + " " + favoriteItem.getPerson());
-                int numOfImages = imageUrlList.size();
-                images = new String[numOfImages + 22];
+//                if (currentId != favoriteItem.getId()) {
+//                    searchPhotos(removeCommonWords(favoriteItem.getName() + " " + favoriteItem.getPerson()));
+//                }
+                imageIndex = imgindex.get(i);
+                ArrayList<String> imageUrls2 = imageUrlList.get(i);
+                int numOfImages = imageUrls2.size();
+                images = new String[numOfImages];
                 for (int i = 0; i < numOfImages; i++) {
-                    images[i] = imageUrlList.get(i);
+                    images[i] = imageUrls2.get(i);
                 }
-                images[numOfImages + 1] = "https://images.unsplash.com/32/Mc8kW4x9Q3aRR3RkP5Im_IMG_4417.jpg?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80";
-                images[numOfImages + 2] = "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80";
-                images[numOfImages + 3] = "https://images.unsplash.com/photo-1531685250784-7569952593d2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80";
-                images[numOfImages + 4] = "https://images.unsplash.com/photo-1531315630201-bb15abeb1653?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=435&q=80";
-                images[numOfImages + 5] = "https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=412&q=80";
-                images[numOfImages + 6] = "https://images.unsplash.com/photo-1522441815192-d9f04eb0615c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=327&q=80";
-                images[numOfImages + 7] = "https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80";
-                images[numOfImages + 8] = "https://images.unsplash.com/photo-1487147264018-f937fba0c817?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80";
-                images[numOfImages + 9] = "https://images.unsplash.com/photo-1476820865390-c52aeebb9891?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80";
-                images[numOfImages + 10] = "https://images.unsplash.com/photo-1516617442634-75371039cb3a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80";
-                images[numOfImages + 11] = "https://images.unsplash.com/photo-1489549132488-d00b7eee80f1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80";
-                images[numOfImages + 12] = "https://images.unsplash.com/photo-1497250681960-ef046c08a56e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80";
-                images[numOfImages + 13] = "https://images.unsplash.com/photo-1436397543931-01c4a5162bdb?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80";
-                images[numOfImages + 14] = "https://images.unsplash.com/photo-1513366208864-87536b8bd7b4?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80";
-                images[numOfImages + 15] = "https://images.unsplash.com/photo-1507608158173-1dcec673a2e5?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80";
-                images[numOfImages + 16] = "https://images.unsplash.com/photo-1519751138087-5bf79df62d5b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80";
-                images[numOfImages + 17] = "https://images.unsplash.com/photo-1483232539664-d89822fb5d3e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=464&q=80";
-                images[numOfImages + 18] = "https://images.unsplash.com/photo-1508615039623-a25605d2b022?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80";
-                images[numOfImages + 19] = "https://images.unsplash.com/photo-1487088678257-3a541e6e3922?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80";
-                images[numOfImages + 20] = "https://images.unsplash.com/photo-1537420327992-d6e192287183?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=388&q=80";
-                images[numOfImages] = "https://images.unsplash.com/photo-1458682625221-3a45f8a844c7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80";
                 Glide.with(context).clear(holder.imgview2);
                 Glide.with(context).load(images[imageIndex]).into(holder.imgview2);
-                //relativeLayout.setBackgroundResource(images[imagesIndex]);
+
                 ++imageIndex;  // update index, so that next time it points to next resource
                 if (imageIndex == images.length)
                     imageIndex = 0; // if we have reached at last index of array, simply restart from beginning
+                imgindex.put(i, imageIndex);
             }
         });
 
@@ -345,6 +365,31 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
         });
     }
 
+    private void preloadedImages() {
+        imageUrls.add("https://images.unsplash.com/32/Mc8kW4x9Q3aRR3RkP5Im_IMG_4417.jpg?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80");
+        imageUrls.add("https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80");
+        imageUrls.add("https://images.unsplash.com/photo-1531685250784-7569952593d2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80");
+        imageUrls.add("https://images.unsplash.com/photo-1531315630201-bb15abeb1653?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=435&q=80");
+        imageUrls.add("https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=412&q=80");
+        imageUrls.add("https://images.unsplash.com/photo-1522441815192-d9f04eb0615c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=327&q=80");
+        imageUrls.add("https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80");
+        imageUrls.add("https://images.unsplash.com/photo-1487147264018-f937fba0c817?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80");
+        imageUrls.add("https://images.unsplash.com/photo-1476820865390-c52aeebb9891?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80");
+        imageUrls.add("https://images.unsplash.com/photo-1516617442634-75371039cb3a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80");
+        imageUrls.add("https://images.unsplash.com/photo-1489549132488-d00b7eee80f1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80");
+        imageUrls.add("https://images.unsplash.com/photo-1497250681960-ef046c08a56e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80");
+        imageUrls.add("https://images.unsplash.com/photo-1436397543931-01c4a5162bdb?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80");
+        imageUrls.add("https://images.unsplash.com/photo-1513366208864-87536b8bd7b4?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80");
+        imageUrls.add("https://images.unsplash.com/photo-1507608158173-1dcec673a2e5?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80");
+        imageUrls.add("https://images.unsplash.com/photo-1519751138087-5bf79df62d5b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80");
+        imageUrls.add("https://images.unsplash.com/photo-1483232539664-d89822fb5d3e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=464&q=80");
+        imageUrls.add("https://images.unsplash.com/photo-1508615039623-a25605d2b022?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80");
+        imageUrls.add("https://images.unsplash.com/photo-1487088678257-3a541e6e3922?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80");
+        imageUrls.add("https://images.unsplash.com/photo-1537420327992-d6e192287183?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=388&q=80");
+        imageUrls.add("https://images.unsplash.com/photo-1458682625221-3a45f8a844c7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80");
+
+    }
+
     //Share image tool
     private Uri getLocalBitmapUri(Bitmap bitmap) {
         Uri bmpUri = null;
@@ -363,8 +408,6 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
         return bmpUri;
     }
 
-
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_STORAGE_PERMISSION_CODE) {
@@ -378,14 +421,13 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
         }
     }
 
-
     @Override
     public int getItemCount() {
         return favoriteList.size();
     }
 
     // Method to search photos using Unsplash API
-    public void searchPhotos(String query) {
+    public void searchPhotos(String query, int id) {
         Call<ApiResponse> call = unsplashApi.searchPhotos(query, "TWpsWTMSvOs4W7pH6J713NkqRh9jmXyZrIHrpmFpW-I");
         Log.d("eeeeeeeeeee: ", query);
         call.enqueue(new Callback<ApiResponse>() {
@@ -396,15 +438,18 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
                     if (apiResponse != null) {
                         List<Result> results = apiResponse.getResults();
                         if (results != null) {
+                            imageUrls = new ArrayList<>();
                             for (Result result : results) {
                                 Urls urls = result.getUrls();
                                 if (urls != null) {
                                     String imageUrl = urls.getSmall();
                                     if (imageUrl != null) {
-                                        imageUrlList.add(imageUrl);
+                                        imageUrls.add(0, imageUrl);
                                     }
                                 }
                             }
+                            preloadedImages();
+                            imageUrlList.put(id, imageUrls);
                         }
                     }
                 } else {
@@ -418,6 +463,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
                 Log.e("FavoriteAdapter", "Error fetching photos: " + t.getMessage());
             }
         });
+
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
