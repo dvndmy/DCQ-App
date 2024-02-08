@@ -84,19 +84,18 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
     public static String removeCommonWords(String input) {
         // Define a set of common words to remove
         Set<String> commonWords = new HashSet<>(Arrays.asList(
-                "the", "a", "an", "and", "but", "or", "for", "nor", "so", "yet",
-                "is", "am", "are", "was", "were", "be", "being", "been",
-                "I", "you", "he", "she", "it", "we", "they",
-                "my", "your", "his", "her", "its", "our", "their",
-                "this", "that", "these", "those",
-                "here", "there", "where",
-                "who", "whom", "whose",
-                "which", "what", "whose", "whom",
-                "how", "when", "why", "whether", "while", "whilst", "because", "since",
-                "upon", "onto", "into", "through", "though", "although", "against", "around", "among",
-                "above", "below", "beneath", "beside", "between", "before", "after", "without", "within", "with",
-                "to", "from", "of", "off", "by", "as", "at", "about", "up", "down", "over", "under"
+                "the", "a", "an", "and", "of", "to", "in", "on", "is", "was", "not", "be",
+                "by", "but", "or", "for", "with", "from", "than", "as", "at", "into", "out",
+                "up", "down", "about", "over", "under", "through", "so", "if", "who", "what",
+                "why", "which", "when", "where", "how", "they", "he", "she", "it", "you", "we",
+                "there", "their", "his", "her", "our", "my", "your", "his", "let", "many", "who",
+                "that", "this", "these", "those", "are", "some", "more", "one", "only", "if", "would",
+                "should", "could", "can", "will", "when", "they", "there", "those", "here", "who", "do",
+                "does", "did", "having", "never", "nothing", "into", "with", "over", "under", "on", "upon",
+                "out", "into", "from", "after", "before", "because", "since", "until", "under", "among",
+                "against", "within", "without", "during", "along", "above", "below", "between", "upon", "around"
         ));
+
 
         // Split the input string into words
         String[] words = input.split("\\s+"); // Split by whitespace
