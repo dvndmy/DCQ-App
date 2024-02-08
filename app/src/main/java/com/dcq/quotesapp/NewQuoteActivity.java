@@ -361,7 +361,7 @@ public class NewQuoteActivity extends AppCompatActivity {
             BufferedReader reader = null;
 
             try {
-                URL url = new URL("https://api.unsplash.com/search/photos?page=1&query=" + params[0] + "&client_id=YOUR_UNSPLASH_ACCESS_KEY");
+                URL url = new URL("https://api.unsplash.com/search/photos?page=1&query=" + params[0] + "&client_id=TWpsWTMSvOs4W7pH6J713NkqRh9jmXyZrIHrpmFpW-I");
                 connection = (HttpURLConnection) url.openConnection();
                 connection.connect();
 
