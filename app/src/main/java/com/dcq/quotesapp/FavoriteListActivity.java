@@ -89,7 +89,7 @@ public class FavoriteListActivity extends AppCompatActivity implements SearchVie
         ArrayList<FavoriteList> filteredList = new ArrayList<>();
 
         for (FavoriteList favorite : imageArry) {
-            if (favorite.getName().toLowerCase().contains(query.toLowerCase())) {
+            if ((favorite.getName().toLowerCase() + "" + favorite.getPerson().toLowerCase()).contains(query.toLowerCase())) {
                 filteredList.add(favorite);
             }
         }
