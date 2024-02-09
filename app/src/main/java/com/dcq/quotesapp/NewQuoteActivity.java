@@ -1,4 +1,5 @@
 package com.dcq.quotesapp;
+// Import statements for necessary Android and third-party libraries
 
 import android.Manifest;
 import android.app.Activity;
@@ -53,6 +54,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -60,41 +62,82 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ * NewQuoteActivity displays the custom quote fetched from Firebase Database
+ * and allows users to interact with them.
+ */
 public class NewQuoteActivity extends AppCompatActivity {
+    // Firebase Database URL
     private static final String FIREBASE_DATABASE_URL = "https://dailycatholicquotes-2ef12-default-rtdb.europe-west1.firebasedatabase.app/";
 
+    // Request code for storage permission
     private final int REQUEST_STORAGE_PERMISSION_CODE = 1;
+
+    // UI elements
     TextView tv_quotes_watermark, saveButton, likeText;
     LinearLayout layout_quote_header;
-    String quoteperson, quotes;
-    int quoteid;
     ImageView imgIcon, iv_save_quote, backgroundImageView;
-    ArrayList<String> preloadedImageUrls;
     LinearLayout saveLayout, copyLayout, shareLayout;
     RelativeLayout quoteContainerLayout;
     LikeButton likeButton;
     TextView quoteTextView, categoryTextView;
+
+    // Data variables
+    String quoteperson, quotes;
+    int quoteid;
+    ArrayList<String> preloadedImageUrls;
+
+    // Retrofit for API calls
     private UnsplashApi unsplashApiService;
+
+    // Firebase database reference
     private DatabaseReference dbQuotes;
+
+    // Array of images and index
     private String[] images;
     private int imagesIndex = 0;
 
+    /**
+     * Initialises the activity layout and components.
+     *
+     * @param savedInstanceState The saved instance state Bundle.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_quote);
 
+        // Initialise toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setTitle("Your Custom Quote");
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        // Enable back button on toolbar
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        // Initialise UI components and setup listeners
+        initialiseViews();
+
+        SharedPreferences sharedPref = getSharedPreferences("search", MODE_PRIVATE);
+        String searchTerm = sharedPref.getString("searchterm", "");
+        SharedPreferences sharedPreferences = getSharedPreferences("dbmax", MODE_PRIVATE);
+        String no = sharedPreferences.getString("max", "3000");
+
+        // Initialize Firebase database reference
+        dbQuotes = FirebaseDatabase.getInstance(FIREBASE_DATABASE_URL).getReference("quotes").child(no);
+
+        // Fetch recently added quote
+        fetchQuotes(searchTerm);
+    }
+
+    /**
+     * Initializes the UI components and sets up click listeners.
+     */
+    private void initialiseViews() {
+        // Initialise UI elements
         quoteTextView = findViewById(R.id.txtQuote);
         Typeface fontQuote = Typeface.createFromAsset(getAssets(), "fonts/montserrat_bold.ttf");
-        imagesIndex = 0;
-
         copyLayout = findViewById(R.id.ll_copy_quote);
         saveLayout = findViewById(R.id.ll_quote_save);
         shareLayout = findViewById(R.id.ll_quote_share);
@@ -109,22 +152,16 @@ public class NewQuoteActivity extends AppCompatActivity {
         likeButton = findViewById(R.id.favBtn);
         layout_quote_header = findViewById(R.id.layout_quote_header);
         layout_quote_header.setVisibility(View.VISIBLE);
+
+        //Initialise variables
         preloadedImageUrls = new ArrayList<>();
+        imagesIndex = 0;
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.unsplash.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         unsplashApiService = retrofit.create(UnsplashApi.class);
-        SharedPreferences sharedPref = getSharedPreferences("search", MODE_PRIVATE);
-        String searchTerm = sharedPref.getString("searchterm", "");
-        SharedPreferences sharedPreferences = getSharedPreferences("dbmax", MODE_PRIVATE);
-        String no = sharedPreferences.getString("max", "3000");
-        // Fetch quotes
-        dbQuotes = FirebaseDatabase.getInstance(FIREBASE_DATABASE_URL).getReference("quotes").child(no);
-        fetchQuotes(searchTerm);
 
-
-        //quote = FirebaseDatabase.getInstance("https://dailycatholicquotes-2ef12-default-rtdb.europe-west1.firebasedatabase.app").getReference().child("quotes").child(no);
         likeButton.setLiked(MainActivity.favoriteDatabase.favoriteDao().isFavorite(quoteid) == 1);
 
         likeButton.setOnLikeListener(new OnLikeListener() {
@@ -169,6 +206,7 @@ public class NewQuoteActivity extends AppCompatActivity {
             }
         });
 
+        // Set up click listeners for changing backgrounds
         quoteContainerLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -176,12 +214,17 @@ public class NewQuoteActivity extends AppCompatActivity {
             }
         });
 
+        // Set up click listeners for save actions
         saveLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 handleSaveButtonClick();
             }
 
+            /**
+             * Handles the click event for saving the quote.
+             * Checks for storage permission and then saves the quote as an image.
+             */
             private void handleSaveButtonClick() {
                 if (ContextCompat.checkSelfPermission(NewQuoteActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                     saveImageToStorage();
@@ -190,6 +233,9 @@ public class NewQuoteActivity extends AppCompatActivity {
                 }
             }
 
+            /**
+             * Saves the current quote as an image to the device storage.
+             */
             private void saveImageToStorage() {
                 try {
                     tv_quotes_watermark.setVisibility(View.VISIBLE);
@@ -265,6 +311,10 @@ public class NewQuoteActivity extends AppCompatActivity {
                 }
             }
 
+            /**
+             * Requests storage permission from the user.
+             * If permission is denied, explains why it's needed.
+             */
             private void requestStoragePermission() {
                 if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) NewQuoteActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
                     // Explain why the permission is needed
@@ -292,12 +342,16 @@ public class NewQuoteActivity extends AppCompatActivity {
             }
         });
 
+        // Set up click listener for copy action
         copyLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 copyQuoteToClipboard();
             }
 
+            /**
+             * Copies the current quote to the clipboard.
+             */
             private void copyQuoteToClipboard() {
                 ClipboardManager clipboard = (ClipboardManager) NewQuoteActivity.this.getSystemService(CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("label", "\"" + quotes + "\"\n -" + quoteperson);
@@ -308,12 +362,16 @@ public class NewQuoteActivity extends AppCompatActivity {
             }
         });
 
+        // Set up click listener for share action
         shareLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showShareOptionsMenu();
             }
 
+            /**
+             * Displays a popup menu with options to share the quote.
+             */
             private void showShareOptionsMenu() {
                 PopupMenu popup = new PopupMenu(NewQuoteActivity.this, shareLayout);
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -392,7 +450,6 @@ public class NewQuoteActivity extends AppCompatActivity {
 
     public void fetchPhotosFromUnsplash(String query) {
         Call<ApiResponse> call = unsplashApiService.searchPhotos(query, "TWpsWTMSvOs4W7pH6J713NkqRh9jmXyZrIHrpmFpW-I");
-        Log.d("eeeeeeeeeee: ", query);
         call.enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
@@ -471,12 +528,18 @@ public class NewQuoteActivity extends AppCompatActivity {
         return bmpUri;
     }
 
-    // Fetch quotes from Firebase Database
+    /**
+     * Fetches quotes from Firebase Database.
+     *
+     * @param searchterm The search term for filtering quotes.
+     */
     private void fetchQuotes(String searchterm) {
         dbQuotes.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
+                    // Retrieve quote data from dataSnapshot
+                    // Update UI with fetched quote
                     try {
                         quotes = dataSnapshot.child("quote").getValue(String.class);
                         quoteperson = dataSnapshot.child("author").getValue(String.class);
@@ -508,13 +571,22 @@ public class NewQuoteActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Handles the response of the permission request.
+     *
+     * @param requestCode  The request code.
+     * @param permissions  The requested permissions.
+     * @param grantResults The results of the permission requests.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_STORAGE_PERMISSION_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, proceed with saving the image
                 Toast.makeText(this, "Permission GRANTED", Toast.LENGTH_SHORT).show();
             } else {
+                // Permission denied, show a message
                 Toast.makeText(this, "Permission DENIED", Toast.LENGTH_SHORT).show();
             }
         }
