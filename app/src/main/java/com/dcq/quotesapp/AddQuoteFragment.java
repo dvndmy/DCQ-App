@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -114,7 +115,7 @@ public class AddQuoteFragment extends Fragment {
                     // Update the maximum quote number in SharedPreferences
                     SharedPreferences sharedPreferences = getContext().getSharedPreferences("dbmax", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("max", String.valueOf(dataSnapshot.getChildrenCount() + 1));
+                    editor.putString("max", String.valueOf(dataSnapshot.getChildrenCount()));
                     editor.apply();
                 }
 
@@ -126,7 +127,7 @@ public class AddQuoteFragment extends Fragment {
 
             SharedPreferences sharedPreferences = getActivity().getSharedPreferences("dbmax", Context.MODE_PRIVATE);
             String no = sharedPreferences.getString("max", "5001");
-
+            Log.d("qqq.adding: ", no);
             // Create a new Quote object
             Quote quotetoadd = new Quote(str_person, no, str_quote, "1", category);
 

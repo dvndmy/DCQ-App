@@ -7,6 +7,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -162,7 +163,7 @@ public class NewQuoteActivity extends AppCompatActivity {
                 .build();
         unsplashApiService = retrofit.create(UnsplashApi.class);
 
-        likeButton.setLiked(MainActivity.favoriteDatabase.favoriteDao().isFavorite(quoteid) == 1);
+        likeButton.setLiked(MainActivity.favoriteDatabase.favoriteDao().isFavorite(quoteid) == 0);
 
         likeButton.setOnLikeListener(new OnLikeListener() {
             @Override
@@ -595,7 +596,7 @@ public class NewQuoteActivity extends AppCompatActivity {
     public void deleteQuote(View view) {
         SharedPreferences sharedPreferences = getSharedPreferences("dbmax", MODE_PRIVATE);
         String no = sharedPreferences.getString("max", "3000");
-        Log.d("qqq7: ", sharedPreferences.getString("max", "lol"));
+        Log.d("qqq.deleting: ", no);
         no = String.valueOf((Integer.parseInt(no)));
         FirebaseDatabase.getInstance("https://dailycatholicquotes-2ef12-default-rtdb.europe-west1.firebasedatabase.app").getReference("quotes").child(no).removeValue();
         Toast.makeText(NewQuoteActivity.this, "Quote Deleted", Toast.LENGTH_SHORT).show();
@@ -604,8 +605,30 @@ public class NewQuoteActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == android.R.id.home)
+        if (item.getItemId() == android.R.id.home) {
+            DatabaseReference db = FirebaseDatabase.getInstance("https://dailycatholicquotes-2ef12-default-rtdb.europe-west1.firebasedatabase.app")
+                    .getReference().child("quotes");
+
+            // Retrieve the count of existing quotes for generating a new quote number
+            db.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    // Update the maximum quote number in SharedPreferences
+                    SharedPreferences sharedPreferences = NewQuoteActivity.this.getSharedPreferences("dbmax", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    Log.d("qqq.beforeback: ", sharedPreferences.getString("max", "lol"));
+                    editor.putString("max", String.valueOf(dataSnapshot.getChildrenCount() + 1));
+                    editor.apply();
+                    Log.d("qqq.afterback: ", sharedPreferences.getString("max", "lol"));
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    // Handle database error if needed
+                }
+            });
             finish();
+        }
         return super.onOptionsItemSelected(item);
     }
 }
