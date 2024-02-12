@@ -76,7 +76,6 @@ public class WallpapersAdapter extends RecyclerView.Adapter<WallpapersAdapter.Wa
     private List<Quote> wallpaperList;
     private final HashMap<Integer, ArrayList<String>> imageUrlList = new HashMap<>();
     private final HashMap<Integer, Integer> imgIndexMap = new HashMap<>();
-    private final HashMap<Integer, Integer> imgindex = new HashMap<>();
     private ArrayList<String> imageUrls;
     private String[] images;
     private int imageIndex = 0;
@@ -324,7 +323,7 @@ public class WallpapersAdapter extends RecyclerView.Adapter<WallpapersAdapter.Wa
     }
 
     private void changeBackground(WallpaperViewHolder holder, int position) {
-        imageIndex = imgindex.get(position);
+        imageIndex = imgIndexMap.get(position);
         ArrayList<String> imageUrls2 = imageUrlList.get(position);
         int numOfImages = imageUrls2.size();
         images = new String[numOfImages];
@@ -337,7 +336,7 @@ public class WallpapersAdapter extends RecyclerView.Adapter<WallpapersAdapter.Wa
         ++imageIndex;  // update index, so that next time it points to next resource
         if (imageIndex == images.length)
             imageIndex = 0; // if we have reached at last index of array, simply restart from beginning
-        imgindex.put(position, imageIndex);
+        imgIndexMap.put(position, imageIndex);
     }
 
     private void handleFavoriteButtonClick(Quote quote, LikeButton favBtn) {
