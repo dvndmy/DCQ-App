@@ -56,6 +56,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -92,9 +93,8 @@ public class WallpapersAdapter extends RecyclerView.Adapter<WallpapersAdapter.Wa
 
     // Remove common words from input string
     public static String removeCommonWords(String input) {
-        Set<String> commonWords = new HashSet<>(Arrays.asList(
-                // Common words to remove
-        ));
+        // Common words to remove
+        Set<String> commonWords = new HashSet<>(Collections.emptyList());
         String[] words = input.split("\\s+");
         StringBuilder result = new StringBuilder();
         for (String word : words) {
@@ -142,7 +142,7 @@ public class WallpapersAdapter extends RecyclerView.Adapter<WallpapersAdapter.Wa
         holder.relativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                changeBackground(holder, position);
+                changeBackground(holder, holder.getAdapterPosition());
             }
         });
 

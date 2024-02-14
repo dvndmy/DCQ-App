@@ -15,7 +15,7 @@
             android:id="@+id/btn_save"
             android:layout_width="148dp"
             android:layout_height="80dp"
-            android:onClick="OnReg"
+            android:onClick="OnSubmit"
             android:text="@string/submit"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

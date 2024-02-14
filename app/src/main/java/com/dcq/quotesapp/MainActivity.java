@@ -26,7 +26,6 @@ import androidx.room.Room;
 import androidx.viewpager.widget.ViewPager;
 
 import com.dcq.quotesapp.adapters.TabAdapter;
-import com.google.android.gms.ads.AdView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.FirebaseApp;
@@ -48,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
     TabLayout tabLayout;
     ViewPager viewPager;
     private AlertDialog dialog;
-    private AdView mAdView;
     private LinearLayout ll_liked_quotes, ll_todays_quote, ll_sounds, ll_about, ll_contact_us, ll_rate_app, ll_share_app, ll_like_fb, ll_follow_insta, ll_telegram, ll_youtube, ll_twitter, ll_email;
 
     @Override
@@ -277,13 +275,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                startActivity(new Intent(MainActivity.this, FavoriteListActivity.class));
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.action_settings) {
+            startActivity(new Intent(MainActivity.this, FavoriteListActivity.class));
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     // Helper method to show the exit dialog
