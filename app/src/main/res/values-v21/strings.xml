@@ -36,7 +36,7 @@
     <string name="enter_person_verse">Enter person/verse:</string>
     <string name="search_term_for_photos_optional">Search term for photos: (Optional)</string>
     <string name="add_quote">Add Quote:</string>
-    <string name="no_favorite">No Favorite</string>
+    <string name="no_favorite">No Liked Quotes</string>
     <string name="no_quotes_found">no quotes found</string>
     <string name="delete_quote_from_database">Delete Quote from Database</string>
     <string name="like">Like</string>

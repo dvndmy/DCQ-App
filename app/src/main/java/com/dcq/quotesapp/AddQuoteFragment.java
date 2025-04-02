@@ -5,10 +5,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -27,18 +27,17 @@ import com.google.firebase.database.ValueEventListener;
 
 public class AddQuoteFragment extends Fragment {
 
-    // Flag to track errors during form submission
-    Boolean noErrors = true;
+    private static final String CATEGORY_PERSON = "1";
+    private static final String CATEGORY_VERSE = "2";
+    private static final String CATEGORY_OTHER = "0";
 
-    // UI elements
-    Button submit;
-    EditText quote, person, search;
-    CheckBox cperson, verse, other;
+    private Button submit, clear;
+    private EditText quote, person, search;
+    private CheckBox cperson, verse, other;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.activity_add_quote, container, false);
     }
 
@@ -46,7 +45,6 @@ public class AddQuoteFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Initialize UI elements
         quote = view.findViewById(R.id.et_quote);
         search = view.findViewById(R.id.et_search);
         person = view.findViewById(R.id.et_person);
@@ -54,15 +52,15 @@ public class AddQuoteFragment extends Fragment {
         verse = view.findViewById(R.id.cb_verse);
         other = view.findViewById(R.id.cb_other);
         submit = view.findViewById(R.id.btn_save);
+        clear = view.findViewById(R.id.btn_clear);
 
-        // Set click listeners for checkboxes and submit button
         cperson.setOnClickListener(this::onPersonClick);
         verse.setOnClickListener(this::onVerseClick);
         other.setOnClickListener(this::onOtherClick);
         submit.setOnClickListener(this::OnSubmit);
+        clear.setOnClickListener(this::OnClear);
     }
 
-    // Handle checkbox clicks
     public void onPersonClick(View view) {
         setCategoryCheckBoxes(true, false, false);
     }
@@ -75,104 +73,97 @@ public class AddQuoteFragment extends Fragment {
         setCategoryCheckBoxes(false, false, true);
     }
 
-    // Helper method to set category checkboxes
+    public void OnClear(View view) {
+        clearFields(quote, person, search);
+    }
+
     private void setCategoryCheckBoxes(boolean personChecked, boolean verseChecked, boolean otherChecked) {
         cperson.setChecked(personChecked);
         verse.setChecked(verseChecked);
         other.setChecked(otherChecked);
     }
 
-    // Handle form submission
+    private void clearFields(EditText... fields) {
+        for (EditText field : fields) {
+            field.setText("");
+        }
+    }
+
     public void OnSubmit(View view) {
         String str_quote = quote.getText().toString();
         String str_person = person.getText().toString();
         String str_search = search.getText().toString();
 
-        String category;
-        if (cperson.isChecked()) {
-            category = "1";
-        } else if (verse.isChecked()) {
-            category = "2";
-        } else {
-            category = "0";
+        String category = cperson.isChecked() ? CATEGORY_PERSON : verse.isChecked() ? CATEGORY_VERSE : CATEGORY_OTHER;
+
+        SharedPreferences sharedPref = requireContext().getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
+        sharedPref.edit().putString("searchterm", str_search).apply();
+
+        if (!checkEnteredData()) {
+            Toast.makeText(requireActivity().getApplicationContext(), "Please make sure you have filled all fields correctly", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        // Save the search term in SharedPreferences
-        SharedPreferences sharedPref = getContext().getSharedPreferences("search", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString("searchterm", str_search);
-        editor.apply();
+        submit.setEnabled(false);
+        DatabaseReference db = FirebaseDatabase.getInstance("https://dailycatholicquotes-2ef12-default-rtdb.europe-west1.firebasedatabase.app")
+                .getReference().child("quotes");
 
-        // Verifies that users have entered all the required fields before registering a quote
-        if (checkEnteredData()) {
-            DatabaseReference db = FirebaseDatabase.getInstance("https://dailycatholicquotes-2ef12-default-rtdb.europe-west1.firebasedatabase.app")
-                    .getReference().child("quotes");
+        db.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String no = String.valueOf(dataSnapshot.getChildrenCount() + 1);
 
-            // Retrieve the count of existing quotes for generating a new quote number
-            db.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    // Update the maximum quote number in SharedPreferences
-                    SharedPreferences sharedPreferences = getContext().getSharedPreferences("dbmax", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("max", String.valueOf(dataSnapshot.getChildrenCount()));
-                    editor.apply();
-                }
+                Quote quotetoadd = new Quote(str_person, no, str_quote, "1", category);
+                db.child(no).setValue(quotetoadd).addOnCompleteListener(task -> {
+                    submit.setEnabled(true);
+                    if (task.isSuccessful()) {
+                        hideKeyboard();
+                        Toast.makeText(getActivity().getApplicationContext(), "Added to Database", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(getActivity(), NewQuoteActivity.class));
+                    } else {
+                        Toast.makeText(getActivity().getApplicationContext(), "Failed to add quote!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    // Handle database error if needed
-                }
-            });
-
-            SharedPreferences sharedPreferences = getActivity().getSharedPreferences("dbmax", Context.MODE_PRIVATE);
-            String no = sharedPreferences.getString("max", "5001");
-            Log.d("qqq.adding: ", no);
-            // Create a new Quote object
-            Quote quotetoadd = new Quote(str_person, no, str_quote, "1", category);
-
-            // Add the new quote to the database
-            db.child(no).setValue(quotetoadd);
-
-            // Display success message and start a new activity
-            Toast.makeText(getActivity().getApplicationContext(), "Added to Database", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(getActivity(), NewQuoteActivity.class));
-        } else {
-            // Display an error message if required fields are not filled
-            Toast.makeText(getActivity().getApplicationContext(), "Please make sure you have filled all fields correctly", Toast.LENGTH_SHORT).show();
-        }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                submit.setEnabled(true);
+                Toast.makeText(getActivity().getApplicationContext(), "Database Error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    // Verifies that users have entered all required fields
-    Boolean checkEnteredData() {
-        noErrors = true;
+    private boolean checkEnteredData() {
+        boolean noErrors = true;
 
-        // Check if the quote field is empty
         if (isEmpty(quote)) {
             noErrors = false;
             quote.setError("Quote is required!");
         }
 
-        // Check if the person/verse field is empty
         if (isEmpty(person)) {
             noErrors = false;
             person.setError("Person/verse is required!");
         }
 
-        // Check if at least one category checkbox is selected
         if (!cperson.isChecked() && !verse.isChecked() && !other.isChecked()) {
             noErrors = false;
-            cperson.setError("Select one!");
-            verse.setError("Select one!");
-            other.setError("Select one!");
+            Toast.makeText(getContext(), "Please select at least one category!", Toast.LENGTH_SHORT).show();
         }
 
         return noErrors;
     }
 
-    // Helper method to check if an EditText is empty
-    boolean isEmpty(EditText text) {
-        CharSequence str = text.getText().toString();
-        return TextUtils.isEmpty(str);
+    private boolean isEmpty(EditText text) {
+        return TextUtils.isEmpty(text.getText().toString());
+    }
+
+    private void hideKeyboard() {
+        View view = getActivity().getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 }

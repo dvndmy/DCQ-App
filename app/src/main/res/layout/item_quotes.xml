@@ -133,6 +133,22 @@
                             android:src="@drawable/ic_menu_quote" />
 
                         <TextView
+                            android:id="@+id/txtAuthor"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/txtQuote"
+                            android:layout_centerHorizontal="true"
+                            android:layout_marginTop="8dp"
+                            android:fontFamily="@font/roboto_light"
+                            android:text=""
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp"
+                            app:autoSizeMaxTextSize="27sp"
+                            app:autoSizeMinTextSize="9sp"
+                            app:autoSizeStepGranularity="0.5sp"
+                            app:autoSizeTextType="uniform" />
+
+                        <TextView
                             android:id="@+id/tv_quotes_watermark"
                             android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
